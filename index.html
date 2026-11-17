@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>VEXORIAN ROLEPLAY · V5</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="ui.css">
+</head>
+<body>
+<div id="game-shell">
+  <canvas id="game" width="640" height="360"></canvas>
+  <div id="vig"></div><div id="hurt"></div>
+
+  <!-- ===== HUD ===== -->
+  <div id="hud" style="display:none">
+    <div class="hud">
+      <div class="brand"><div class="brand-mark">V</div><div><b>VEXORIAN</b><small>ROLEPLAY V5</small></div></div>
+      <div class="stats">
+        <div class="stat"><small>DINERO</small><b id="hud-money">$0</b></div>
+        <div class="stat"><small>ID</small><b id="hud-id">#0</b></div>
+        <div class="stat"><small>NIVEL</small><b id="hud-level">1</b></div>
+        <div class="stat"><small>HORA</small><b><span id="hud-clock">12:00</span> <span id="hud-weather"></span></b></div>
+      </div>
+      <div class="net" id="net"></div>
+      <button class="icon-btn" id="btn-panel" style="display:none"></button>
+      <button class="icon-btn" id="btn-vip" style="display:none">💎 VIP</button>
+      <button class="icon-btn" id="btn-map" title="Mapa (M)">🗺️ Mapa</button>
+      <button class="icon-btn pos" id="btn-phone" title="Teléfono (P)">📱<span id="ph-dot" class="dotbadge" style="display:none">0</span></button>
+      <button class="icon-btn" id="btn-sound" title="Sonido">🔊</button>
+      <button class="icon-btn" id="btn-pause" title="Menú (Esc)">☰</button>
+    </div>
+    <div class="vitals">
+      <div class="vrow hp"><span>VIDA</span><div class="bar"><i id="b-hp"></i></div><em id="v-hp">100</em></div>
+      <div class="vrow food"><span>COMIDA</span><div class="bar"><i id="b-food"></i></div><em id="v-food">100</em></div>
+      <div class="vrow water"><span>SED</span><div class="bar"><i id="b-water"></i></div><em id="v-water">100</em></div>
+      <div class="vrow nrg"><span>ENERGÍA</span><div class="bar"><i id="b-nrg"></i></div><em id="v-nrg">100</em></div>
+      <div class="tags" id="tags"></div>
+    </div>
+    <div class="fps" id="fps"></div>
+    <div class="chat"><div id="chat-log"></div><div class="chat-row"><input id="chat-input" maxlength="120" placeholder="Chat de la ciudad… (Enter)" autocomplete="off"><button id="chat-hist-btn" title="Historial del chat">☰</button></div></div>
+    <div id="chat-hist" style="display:none"><div class="ch-top"><b>Historial del chat</b><button id="chat-hist-close" class="secondary">✕</button></div><div id="chat-hist-list"></div></div>
+    <div id="fuel" style="display:none"><span id="fuel-pct"></span><div class="bar"><i id="fuel-fill"></i></div></div>
+    <button id="pose-ui" style="display:none">Levantarte (E)</button>
+    <div class="mission-card" id="mission"><div class="mission-label">MISIÓN</div><b id="m-title"></b><p id="m-text"></p></div>
+    <div class="minimap-wrap"><span>MINIMAPA</span><canvas id="mm" width="160" height="116"></canvas></div>
+    <div class="weapon" id="weapon" style="display:none"></div>
+    <div class="hotbar" id="hotbar"></div>
+    <div class="prompt" id="prompt" style="display:none"></div>
+    <div class="controls">WASD mover · Shift correr · E interactuar/levantarte · F vehículo · M mapa · P teléfono · G arma · R recargar · 1-9 objetos · Enter chat</div>
+    <div id="creator-bar" style="display:none">
+      <b>CREATOR</b>
+      <button id="cb-fly" title="Volar (F6)">🕊️ Volar</button><button id="cb-speed" title="Velocidad (F7)">⚡ Veloz</button>
+      <button id="cb-invisible" title="Invisible (F8)">👻 Invisible</button><button id="cb-rain">🌧️</button><button id="cb-storm">⛈️</button>
+      <button id="cb-admin" title="Panel (F9)">🛠️ Panel</button>
+    </div>
+    <button id="btn-admin" style="display:none"></button>
+  </div>
+  <div class="toast" id="toast"></div>
+  <div id="fade"></div>
+
+  <!-- ===== Muerte / hospital ===== -->
+  <div id="death" class="overlay" style="display:none"><div class="dialog center"><h1>💀</h1><p id="death-msg"></p></div></div>
+  <div id="hosp-ui" style="display:none">
+    <div class="hosp-card"><b>🏥 Hospital Central</b><small id="hosp-msg"></small>
+      <div class="hbar"><i id="hosp-fill"></i></div><div class="hpct" id="hosp-pct">0%</div>
+      <button id="hosp-btn" style="display:none">Levantarte (E)</button></div>
+  </div>
+
+  <!-- ===== Panel genérico (tiendas, armería, probador…) ===== -->
+  <div id="panel" class="overlay" style="display:none"><div class="dialog shop">
+    <button class="x" id="panel-close" aria-label="Cerrar">✕</button>
+    <div class="eyebrow">VEXORIAN RP</div><h1 id="panel-title"></h1><p id="panel-sub"></p><div id="panel-body"></div>
+  </div></div>
+
+  <!-- ===== Pausa y ajustes ===== -->
+  <div id="pause" class="overlay" style="display:none"><div class="dialog">
+    <div class="eyebrow">PAUSA</div><h1 style="font-size:30px">Menú</h1><p id="pause-user"></p>
+    <label>Volumen</label><input type="range" id="vol" min="0" max="100" style="width:100%;margin-bottom:10px">
+    <button id="p-resume">Continuar</button><button class="secondary" id="p-save">Guardar ahora</button>
+    <button class="secondary" id="p-settings">Gráficos y rendimiento</button><button class="secondary" id="p-logout">Cerrar sesión</button>
+  </div></div>
+  <aside class="settings" id="settings" style="display:none">
+    <header><b>Gráficos y rendimiento</b><small>Ajustes de calidad de imagen</small></header>
+    <div id="settings-body"></div>
+    <button class="secondary" id="set-reset">Restablecer valores</button><button id="set-close">Cerrar</button>
+  </aside>
+
+  <!-- ===== Mapa completo ===== -->
+  <div id="mapui" style="display:none">
+    <div class="map-top"><b>🗺️ Mapa de la ciudad</b><label class="chk"><input type="checkbox" id="map-pl" checked> Mostrar jugadores</label>
+      <span id="map-zoom" class="muted">100%</span>
+      <button id="map-in">＋</button><button id="map-out">－</button><button id="map-me">📍 Mi posición</button><button id="map-fit">Ver todo</button><button id="map-close" class="secondary">✕ Cerrar (M)</button></div>
+    <div class="map-main"><canvas id="map-cv"></canvas><div id="map-legend"></div></div>
+  </div>
+
+  <!-- ===== Teléfono ===== -->
+  <div id="phone" class="phone" style="display:none">
+    <div class="ph-top"><button id="ph-back" class="secondary" style="display:none">‹</button><b id="ph-title">Mensajes</b><button id="ph-close" class="secondary">✕</button></div>
+    <div class="ph-body" id="ph-body"></div>
+    <div class="ph-send" id="ph-send" style="display:none"><input id="ph-input" maxlength="300" placeholder="Escribe un mensaje…" autocomplete="off"><button id="ph-sendbtn">➤</button></div>
+    <div class="ph-tabs" id="ph-tabs"><button data-t="msgs" class="on">💬 Mensajes</button><button data-t="ctc">👤 Contactos</button><button data-t="ply">🌐 Jugadores</button></div>
+  </div>
+
+  <!-- ===== Panel CREATOR ===== -->
+  <div id="admin" class="overlay" style="display:none"><div class="admin">
+    <div class="admin-top"><b id="admin-title">🛠️ Panel CREATOR</b>
+      <nav><button class="atab on" data-t="players">Jugadores</button><button class="atab" data-t="economy">Economía</button><button class="atab" data-t="world">Mundo</button><button class="atab" data-t="houses">Casas</button><button class="atab" data-t="log">Historial</button></nav>
+      <button id="admin-close" class="secondary">✕</button></div>
+    <div id="admin-body"></div>
+  </div></div>
+
+  <!-- ===== Controles táctiles ===== -->
+  <div id="touch" style="display:none">
+    <div id="joy"><div id="joy-knob"></div></div>
+    <div class="tbtns">
+      <button data-a="e">E</button><button data-a="f">🚗</button><button data-a="g">🔫</button><button data-a="r">R</button>
+      <button data-a="run">🏃</button><button data-a="brake">⛔</button><button data-a="map">🗺️</button><button data-a="ph">📱</button><button data-a="chat">💬</button>
+    </div>
+  </div>
+
+  <!-- ===== Acceso ===== -->
+  <div id="auth" class="overlay authbg">
+    <div class="dialog authbox">
+      <img class="logo" src="logo.png" alt="VEXORIAN ROLEPLAY">
+      <div id="scr-loading" style="display:none"><h1>Cargando…</h1><p>Conectando con la ciudad</p></div>
+
+      <div id="scr-login">
+        <h1 class="sr">Iniciar sesión</h1><p>Inicia sesión para continuar tu historia.</p>
+        <form id="f-login" novalidate>
+          <label>Correo electrónico</label><input id="l-email" type="email" autocomplete="email" required>
+          <label>Contraseña</label><input id="l-pass" type="password" autocomplete="current-password" required>
+          <div class="pass-msg" id="login-msg"></div>
+          <button type="submit">Iniciar sesión</button>
+        </form>
+        <div class="links"><a href="#" data-go="register">Crear cuenta</a><a href="#" data-go="recover">¿Olvidaste tu contraseña?</a></div>
+      </div>
+
+      <div id="scr-register" style="display:none">
+        <h1>Crear <em>cuenta</em></h1><p>Tu progreso se guarda para siempre en tu cuenta.</p>
+        <form id="f-register" novalidate>
+          <label>Nombre de usuario</label><input id="r-user" maxlength="16" autocomplete="username" placeholder="3–16 letras, números o _">
+          <label>Correo electrónico</label><input id="r-email" type="email" autocomplete="email">
+          <label>Contraseña (mín. 8)</label><input id="r-pass" type="password" autocomplete="new-password">
+          <label>Repetir contraseña</label><input id="r-pass2" type="password" autocomplete="new-password">
+          <div class="pass-msg" id="reg-msg"></div><button type="submit">Crear cuenta</button>
+        </form>
+        <div class="links"><a href="#" data-go="login">Ya tengo cuenta</a></div>
+      </div>
+
+      <div id="scr-recover" style="display:none">
+        <h1>Recuperar <em>acceso</em></h1><p>Te enviaremos un enlace para elegir una nueva contraseña.</p>
+        <form id="f-recover" novalidate><label>Correo electrónico</label><input id="rc-email" type="email" autocomplete="email">
+          <div class="pass-msg" id="rec-msg"></div><button type="submit">Enviar enlace</button></form>
+        <div class="links"><a href="#" data-go="login">Volver</a></div>
+      </div>
+
+      <div id="scr-newpass" style="display:none">
+        <h1>Nueva <em>contraseña</em></h1><p>Elige una contraseña nueva para tu cuenta.</p>
+        <form id="f-newpass" novalidate><label>Nueva contraseña (mín. 8)</label><input id="np-pass" type="password" autocomplete="new-password">
+          <label>Repetir contraseña</label><input id="np-pass2" type="password" autocomplete="new-password">
+          <div class="pass-msg" id="np-msg"></div><button type="submit">Guardar contraseña</button></form>
+      </div>
+
+      <div id="scr-start" style="display:none">
+        <div class="eyebrow">SESIÓN INICIADA · ID <b id="st-id"></b></div><h1 id="st-name" style="font-size:34px"></h1><div id="st-roles" class="roles"></div>
+        <div class="grid2" style="margin:14px 0"><div><small>Dinero</small><b id="st-money"></b></div><div><small>Nivel</small><b id="st-lvl"></b></div></div>
+        <button id="st-play">Entrar a la ciudad</button><button class="secondary" id="st-switch">Cambiar de cuenta</button>
+      </div>
+      <small class="ver">VEXORIAN ROLEPLAY V5 · tus datos se guardan en Supabase</small>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="settings.js"></script>
+<script src="world.js"></script>
+<script src="art.js"></script>
+<script src="interiors.js"></script>
+<script src="audio.js"></script>
+<script src="api.js"></script>
+<script src="player.js"></script>
+<script src="npcs.js"></script>
+<script src="vehicles.js"></script>
+<script src="net.js"></script>
+<script src="economy.js"></script>
+<script src="combat.js"></script>
+<script src="hospital.js"></script>
+<script src="clothes.js"></script>
+<script src="map.js"></script>
+<script src="admin.js"></script>
+<script src="phone.js"></script>
+<script src="game.js"></script>
+<script src="ui.js"></script>
+</body>
+</html>

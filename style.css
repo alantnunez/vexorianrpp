@@ -1,0 +1,151 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+:root{font-family:'DM Sans',sans-serif;color:#f5f7f6;background:#0c100e;font-synthesis:none}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:#0c100e;overflow:hidden}
+#game-shell{position:relative;width:100vw;height:100vh;overflow:hidden;background:#0b0f0d;user-select:none}
+#game{display:block;width:100%;height:100%;image-rendering:pixelated}
+.hidden{display:none!important}
+
+/* HUD */
+.hud{position:absolute;top:14px;left:14px;right:14px;display:flex;align-items:center;gap:18px;pointer-events:none}
+.brand,.stats,.mission-card,.minimap-wrap,.controls,.prompt{background:#101914e8;border:1px solid #ffffff1a;box-shadow:0 8px 25px #0005;backdrop-filter:blur(8px)}
+.brand{display:flex;align-items:center;gap:10px;padding:9px 13px;border-radius:12px}
+.brand-mark{display:grid;place-items:center;width:36px;height:36px;border-radius:9px;background:#b5ed67;color:#142018;font-weight:900;font-family:'Space Grotesk';font-size:15px}
+.brand b{display:block;font-family:'Space Grotesk';letter-spacing:1.2px;font-size:13px}
+.brand small{display:block;color:#91a49a;font-size:10px;margin-top:2px;text-transform:capitalize}
+.stats{display:flex;gap:20px;padding:9px 16px;border-radius:12px}
+.stat small,.bars span{display:block;color:#94a79b;font-size:9px;font-weight:800;letter-spacing:1px}
+.stat b{display:block;font-family:'Space Grotesk';font-size:16px;margin-top:3px;white-space:nowrap}
+.stat:first-child b{color:#b5ed67}
+.bars{margin-left:auto;width:120px}
+.bar{height:7px;border-radius:8px;background:#405147;margin-top:7px;overflow:hidden}
+.bar i{display:block;width:100%;height:100%;background:#b5ed67;transition:width .2s}
+.icon-btn{pointer-events:auto;width:auto;margin:0;padding:10px 14px;border-radius:10px;background:#101914e8;border:1px solid #ffffff22;color:#e5eee8;font:700 12px 'DM Sans'}
+.fps{position:absolute;top:76px;right:16px;font:700 11px 'Space Grotesk';color:#b5ed67;text-shadow:0 1px 3px #000}
+.fps:empty{display:none}
+
+.mission-card{position:absolute;left:14px;bottom:54px;width:260px;padding:14px 16px;border-radius:12px}
+.mission-label,.eyebrow{font-size:9px;font-weight:800;letter-spacing:1.5px;color:#b5ed67}
+.mission-card b{display:block;margin-top:7px;font-family:'Space Grotesk';font-size:14px}
+.mission-card p{font-size:12px;color:#bdc9c1;line-height:1.5;margin:7px 0}
+.mission-foot{display:flex;justify-content:space-between;gap:8px}
+.mission-foot small{font-size:10px;color:#9fb1a5;font-weight:700;letter-spacing:.5px}
+#order-timer{color:#ffd04a}
+.minimap-wrap{position:absolute;right:14px;bottom:54px;padding:8px;border-radius:11px}
+.minimap-wrap span{display:block;font-size:9px;font-weight:800;letter-spacing:1.4px;color:#b5ed67;margin:0 0 5px 3px}
+.minimap-wrap canvas{display:block;width:160px;height:116px;border-radius:6px}
+.controls{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);white-space:nowrap;padding:8px 13px;border-radius:8px;font-size:11px;color:#c1cec5}
+.prompt{position:absolute;bottom:62px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:9px 15px;border-radius:10px;font-size:13px;font-weight:600;pointer-events:none}
+.prompt kbd{display:grid;place-items:center;min-width:24px;height:24px;border-radius:6px;background:#b5ed67;color:#142018;font:800 12px 'Space Grotesk'}
+.toast{position:absolute;top:92px;left:50%;transform:translateX(-50%);max-width:min(560px,92%);text-align:center;padding:10px 16px;border-radius:9px;background:#101914ed;border:1px solid #b5ed6766;color:#eaf5ec;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.show{opacity:1}
+
+/* Menús */
+.overlay{position:absolute;inset:0;display:grid;place-items:center;background:#07100bb8;backdrop-filter:blur(4px);z-index:20}
+.dialog{width:min(390px,calc(100% - 32px));padding:32px;border:1px solid #ffffff20;border-radius:18px;background:linear-gradient(145deg,#1b2921,#101914);box-shadow:0 25px 70px #0009}
+.dialog h1{font-family:'Space Grotesk';font-size:40px;letter-spacing:-2px;margin:10px 0}
+.dialog h1 em{font-style:normal;color:#b5ed67}
+.dialog p{color:#aab9af;font-size:13px;line-height:1.6;margin-bottom:22px}
+.dialog label{display:block;font-size:10px;color:#aab9af;font-weight:700;margin-bottom:7px;text-transform:uppercase;letter-spacing:1px}
+.dialog input{width:100%;padding:12px;border-radius:8px;border:1px solid #415448;background:#0c1510;color:#fff;font:inherit;margin-bottom:12px;outline:none}
+.dialog input:focus{border-color:#b5ed67}
+button{width:100%;padding:12px;border:0;border-radius:8px;background:#b5ed67;color:#142018;font:800 12px 'DM Sans';cursor:pointer;margin-top:7px}
+button:hover{filter:brightness(1.08)}
+button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+button.secondary{background:#293a30;color:#e5eee8}
+.dialog>small{display:block;text-align:center;color:#74877b;font-size:10px;margin-top:17px}
+
+/* Panel de ajustes */
+.settings{position:absolute;top:0;right:0;bottom:0;width:min(370px,100%);z-index:30;display:flex;flex-direction:column;padding:22px 20px;background:#0e1612f4;border-left:1px solid #ffffff1f;backdrop-filter:blur(10px);box-shadow:-20px 0 60px #0007}
+.settings header{margin-bottom:10px}
+.settings header b{display:block;font:700 22px 'Space Grotesk'}
+.settings header small{color:#8fa095;font-size:12px}
+#settings-body{flex:1;overflow:auto;padding-right:6px;margin-bottom:8px}
+.set-h{margin:16px 0 2px;font-size:10px;font-weight:800;letter-spacing:1.5px;color:#b5ed67}
+.set-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #ffffff12;font-size:13px;cursor:pointer}
+.set-row select{background:#0c1510;color:#fff;border:1px solid #415448;border-radius:7px;padding:6px 8px;font:inherit;outline:none}
+.set-row input[type=range]{width:140px;accent-color:#b5ed67}
+.set-row input[type=checkbox]{appearance:none;-webkit-appearance:none;flex:none;width:40px;height:22px;margin:0;border-radius:12px;background:#33443a;position:relative;cursor:pointer;transition:background .2s}
+.set-row input[type=checkbox]::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s}
+.set-row input[type=checkbox]:checked{background:#b5ed67}
+.set-row input[type=checkbox]:checked::after{left:21px;background:#142018}
+
+@media(max-width:700px){
+  .hud{top:8px;left:8px;right:8px;gap:6px;flex-wrap:wrap}
+  .brand{padding:7px}.brand small{display:none}
+  .stats{gap:10px;padding:8px}.stat b{font-size:12px}
+  .bars{display:none}
+  .mission-card{left:8px;bottom:45px;width:190px;padding:10px}.mission-card p{font-size:10px}
+  .minimap-wrap{right:8px;bottom:45px}.minimap-wrap canvas{width:120px;height:88px}
+  .controls{font-size:8px;max-width:96%;white-space:normal;text-align:center;bottom:5px}
+}
+
+
+/* ===== v3: supervivencia, chat, teléfono, tienda ===== */
+.bars{display:none}
+.net{margin-left:auto;padding:8px 13px;border-radius:10px;font-size:11px;font-weight:700;background:#101914e8;border:1px solid #ffffff1a;color:#8fa095;pointer-events:none}
+.net:empty{display:none}
+.net.ok{color:#7dffb0}
+.icon-btn{margin-left:0}
+.vitals,.weapon{background:#101914e8;border:1px solid #ffffff1a;box-shadow:0 8px 25px #0005;backdrop-filter:blur(8px)}
+.vitals{position:absolute;right:14px;top:78px;width:222px;padding:10px 13px;border-radius:12px;pointer-events:none}
+.vrow{display:grid;grid-template-columns:82px 1fr 28px;align-items:center;gap:8px;margin:7px 0;font-size:9px;font-weight:800;letter-spacing:.7px;color:#94a79b}
+.vrow .bar{margin-top:0;height:8px}
+.vrow em{font-style:normal;text-align:right;color:#e5eee8;font-size:11px}
+.vrow.hp i{background:#ff5d6c}.vrow.food i{background:#ffb347}.vrow.water i{background:#4ac3ff}.vrow.nrg i{background:#b5ed67}
+.vrow.low i{animation:blink .8s infinite}
+@keyframes blink{50%{opacity:.3}}
+.tags{min-height:12px;margin-top:4px;font-size:10px;font-weight:700;color:#ffd04a;letter-spacing:.4px}
+.fps{top:268px}
+.weapon{position:absolute;right:14px;bottom:212px;padding:9px 14px;border-radius:10px;font:700 14px 'Space Grotesk';color:#ffe9a0;pointer-events:none}
+
+.chat{position:absolute;left:14px;top:84px;width:330px;pointer-events:none}
+#chat-log{max-height:176px;overflow:hidden;font-size:12px;line-height:1.45;text-shadow:0 1px 3px #000}
+.cl{background:#0b120ecc;padding:3px 8px;border-radius:6px;margin-bottom:3px;width:fit-content;max-width:100%;word-break:break-word}
+.cl b{color:#b5ed67}.cl b.gang{color:#d6a6ff}
+.cl.sys{color:#ff9b9b;font-style:italic}
+#chat-input{pointer-events:auto;margin:4px 0 0;width:100%;padding:8px 10px;border-radius:8px;border:1px solid #ffffff22;background:#0b120ecc;color:#fff;font:inherit;font-size:12px;outline:none;opacity:.5}
+#chat-input:focus{opacity:1;border-color:#b5ed67}
+
+.hotbar{position:absolute;bottom:56px;left:50%;transform:translateX(-50%);display:flex;gap:6px}
+.slot{position:relative;width:54px;height:54px;padding:0;margin:0;border-radius:10px;background:#101914e8;border:1px solid #ffffff26;color:#fff;font-size:24px}
+.slot b{position:absolute;right:5px;bottom:3px;font:800 11px 'Space Grotesk'}
+.slot small{position:absolute;left:5px;top:3px;font-size:9px;color:#b5ed67;font-weight:800}
+.prompt{bottom:122px}
+.controls{font-size:10px}
+
+.phone{position:absolute;right:24px;top:50%;transform:translateY(-50%);width:304px;height:490px;z-index:15;display:flex;flex-direction:column;background:#0b0f14;border:3px solid #2a3340;border-radius:30px;overflow:hidden;box-shadow:0 25px 70px #000a}
+.ph-top{display:flex;align-items:center;gap:8px;padding:16px 14px 10px;background:linear-gradient(#18222e,#0b0f14)}
+.ph-top b{flex:1;font:700 15px 'Space Grotesk'}
+.ph-top button,.ph-row button,.ph-send button{width:auto;margin:0;padding:6px 10px;font-size:12px}
+.ph-body{flex:1;overflow:auto;padding:6px 12px}
+.ph-row{display:flex;align-items:center;gap:8px;padding:10px 4px;border-bottom:1px solid #ffffff12;font-size:13px}
+.ph-row.click{cursor:pointer}
+.ph-row .grow{flex:1;min-width:0}
+.ph-empty{color:#8fa095;font-size:12px;text-align:center;margin:30px 10px}
+.dot{width:9px;height:9px;border-radius:50%;background:#4ade80;flex:none}.dot.off{background:#566}
+.badge{background:#ff5d6c;color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:800}
+.msg{max-width:82%;padding:7px 11px;border-radius:13px;margin:5px 0;font-size:13px;word-break:break-word}
+.msg.me{margin-left:auto;background:#b5ed67;color:#142018}
+.msg.them{background:#25303c}
+.ph-send{display:flex;gap:6px;padding:8px 10px;background:#0f151c}
+.ph-send input{flex:1;margin:0;padding:9px 11px;border-radius:10px;border:1px solid #2a3340;background:#0b0f14;color:#fff;font:inherit;font-size:12px;outline:none}
+.ph-tabs{display:flex;border-top:1px solid #ffffff18}
+.ph-tabs button{flex:1;margin:0;border-radius:0;background:#121a22;color:#cfd8dc;padding:13px 2px;font-size:11px}
+.ph-tabs button.on{color:#b5ed67}
+
+.shop{width:min(560px,calc(100% - 32px));max-height:88vh;overflow:auto}
+.shop h1{font-size:30px;margin:6px 0}
+.shop-money{color:#b5ed67;font:700 14px 'Space Grotesk';margin-bottom:6px}
+.shop-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #ffffff14}
+.shop-row i{font-size:28px;font-style:normal;width:34px;text-align:center}
+.shop-row .grow{flex:1}
+.shop-row small{display:block;color:#8fa095;font-size:11px;margin-top:2px}
+.shop-row button{width:auto;margin:0;padding:9px 14px}
+button:disabled{opacity:.4;cursor:not-allowed;filter:none}
+.set-h{margin:16px 0 2px;font-size:10px;font-weight:800;letter-spacing:1.5px;color:#b5ed67}
+.pass-msg{min-height:16px;color:#ff8f8f;font-size:12px;margin-bottom:4px}
+
+@media(max-width:700px){
+  .vitals{width:170px;top:70px}.vrow{grid-template-columns:58px 1fr 24px}.chat{width:230px;top:150px}.phone{right:8px;width:270px;height:430px}
+}
